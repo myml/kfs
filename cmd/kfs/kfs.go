@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"log"
@@ -10,6 +9,7 @@ import (
 	"github.com/kamijin-fanta/nbd-go"
 	ks "github.com/myml/kfs-ks"
 	blob "github.com/myml/kfs-storage-blob"
+	gz "github.com/myml/kfs-storage-gz"
 
 	_ "gocloud.dev/blob/fileblob"
 	_ "gocloud.dev/blob/memblob"
@@ -31,10 +31,7 @@ func main() {
 	flag.Parse()
 
 	factory := &KSDeviceFactory{
-		blobuURL: "s3://test?" +
-			"endpoint=127.0.0.1:9000&region=us-west-1&" +
-			"disableSSL=true&" +
-			"s3ForcePathStyle=true",
+		blobuURL: url,
 	}
 
 	fmt.Printf("listen on %s %s\n", network, addr)
@@ -69,9 +66,8 @@ func NewKSDeviceConnection(url string) (*KSDeviceConnection, error) {
 	if err != nil {
 		return nil, fmt.Errorf("new blob: %w", err)
 	}
-	log.Println("set", b.Set("test", bytes.NewReader([]byte("hello"))))
-	log.Println(url)
-	stream := ks.NewStream(ks.WithChunkSize(1024*1024*4), ks.WithStorage(b))
+	g := &gz.Storage{RawStorage: b}
+	stream := ks.NewStream(ks.WithStorage(g), ks.WithChunkSize(1024*1024*4), ks.WithDebug(true))
 	return &KSDeviceConnection{f: stream, size: size}, nil
 }
 
@@ -85,7 +81,7 @@ func (m *KSDeviceConnection) ExportList() ([]string, nbd.Errno) {
 }
 
 func (m *KSDeviceConnection) Info(export string) (name, description string, totalSize uint64, blockSize uint32, errno nbd.Errno) {
-	return "default", "default exports", m.size, 1024 * 4, 0 // 4K Block
+	return "default", "default exports", m.size, 1024 * 1024 * 4, 0 // 4K Block
 }
 
 func (m *KSDeviceConnection) Read(offset uint64, length uint32) ([]byte, nbd.Errornum) {

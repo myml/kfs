@@ -6,6 +6,7 @@ require (
 	github.com/kamijin-fanta/nbd-go v0.0.0-20210105145357-74c954624192
 	github.com/myml/kfs-ks v0.1.0
 	github.com/myml/kfs-storage-blob v0.0.0-20220123090812-bed69908c7c9
+	github.com/myml/kfs-storage-gz v0.0.0-20220123112329-31664f006dfc
 	gocloud.dev v0.24.0
 )
 
