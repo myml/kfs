@@ -8,12 +8,10 @@ import (
 	"net"
 
 	"github.com/kamijin-fanta/nbd-go"
+	ks "github.com/myml/kfs-ks"
 	blob "github.com/myml/kfs-storage-blob"
-	"github.com/myml/ks"
 
-	_ "gocloud.dev/blob/azureblob"
 	_ "gocloud.dev/blob/fileblob"
-	_ "gocloud.dev/blob/gcsblob"
 	_ "gocloud.dev/blob/memblob"
 	_ "gocloud.dev/blob/s3blob"
 )
